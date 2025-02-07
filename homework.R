@@ -16,7 +16,8 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 #Use typeof to check that your conversion succeeded
 
 #ANSWER
-
+glimpse(ds$Year) 
+ds$Year <- as.numeric(ds$Year)
 
 ### Question 2 ---------- 
 
@@ -24,14 +25,21 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # change ds so that all of the variables are lowercase
 
 #ANSWER
+library(dplyr)
+ds <- ds %>% rename(rank = Rank)
+ds <- ds %>% rename(song = Song)
+ds <- ds %>% rename(artist = Artist)
+ds <- ds %>% rename(year = Year)
 
 ### Question 3 ----------
 
 # Use mutate to create a new variable in ds that has the decade of the year as a number
 # For example, 1971 would become 1970, 2001 would become 2000
 # Hint: read the documentation for ?floor
+?floor
 
 #ANSWER
+ds <- ds %>% mutate(decade = floor(year / 10) * 10)
 
 ### Question 4 ----------
 
@@ -39,12 +47,15 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 
 #ANSWER
 
+ds <- ds %>% arrange(rank)
+
 ### Question 5 ----------
 
 # Use filter and select to create a new tibble called 'top10'
 # That just has the artists and songs for the top 10 songs
 
 #ANSWER
+top10 <- ds %>% select(c("rank", "artist", "song")) %>% slice(1:10)
 
 
 ### Question 6 ----------
@@ -53,7 +64,9 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # of all songs on the full list. Save it to a new tibble called "ds_sum"
 
 #ANSWER
-
+ds_sum <- ds %>% summarize(earliest = min(year, na.rm = T),
+                           recent = max(year, na.rm = T),
+                           average = mean(year, na.rm = T))
 
 ### Question 7 ----------
 
@@ -62,6 +75,7 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Use one filter command only, and sort the responses by year
 
 #ANSWER
+ds %>% filter(year %in% c(ds_sum$earliest, ds_sum$recent, round(ds_sum$average))) %>% arrange(year)
 
 
 ### Question 8 ---------- 
@@ -73,7 +87,17 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # find the correct oldest, averag-ist, and most recent songs
 
 #ANSWER
+ds <- ds %>% mutate(year = ifelse(song == "Brass in Pocket", 1979, year))
 
+ds <- ds %>% mutate(decade = floor(year / 10) * 10)
+
+
+ds_sum <- ds %>% summarize(earliest = min(year, na.rm = T),
+                           recent = max(year, na.rm = T),
+                           average = mean(year, na.rm = T))
+
+
+ds %>% filter(year %in% c(ds_sum$earliest, ds_sum$recent, round(ds_sum$average))) %>% arrange(year)
 
 ### Question 9 ---------
 
@@ -84,7 +108,7 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Use the pipe %>% to string the commands together
 
 #ANSWER
-
+ds %>% filter(!is.na(decade)) %>% group_by(decade) %>% summarize(avg_rank = mean(rank, na.rm = TRUE), count = n()) %>% arrange(decade)
 
 ### Question 10 --------
 
@@ -94,5 +118,7 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Use the pipe %>% to string the commands together
 
 #ANSWER
+
+ds %>% count(decade) %>% slice_max(n, n = 1) 
 
   
