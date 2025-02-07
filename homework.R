@@ -1,6 +1,9 @@
 #PSYC 259 Homework 2 - Data Transformation
 #For full credit, provide answers for at least 7/10
 
+
+#Student Name: Hugo Salazar
+
 #List names of students collaborating with: 
 
 ### SETUP: RUN THIS BEFORE STARTING ----------
